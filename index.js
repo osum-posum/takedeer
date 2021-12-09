@@ -19,11 +19,11 @@ const db = mysql.createConnection({
 app.post('/create', (request, response) => {
     const { username, password, confirmPassword } = request.body;
     const sqlSearch = "SELECT * FROM userstable WHERE username = ?";
-    const sqlInsert = "INSERT INTO userstable WHERE (username, password) VALUES (?, ?)";
+    const sqlInsert = "INSERT INTO userstable (username, password) VALUES (?, ?)";
     const searchQuery = mysql.format(sqlSearch, [username]);
     const insertQuery = mysql.format(sqlInsert, [username, password]);
 
-    db.query(searchUsernameQuery, async(error, result) => {
+    db.query(searchQuery, async(error, result) => {
         if (error) {
             return console.log(error);
         };
@@ -38,7 +38,13 @@ app.post('/create', (request, response) => {
 
         let hashedPassword = await bcrypt.hash(password, 10);
 
-        db.query()
+        db.query(insertQuery, (error, result) => {
+            if (error){
+                console.log
+            } else {
+                return res.render('register', {message: 'user created'})
+            };
+        });
 
     });
 });
