@@ -10,7 +10,7 @@ const User = () => {
 
     return (
         <Container>
-
+            <p>hi</p>
         </Container>
     );
 };

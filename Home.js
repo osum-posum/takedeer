@@ -1,12 +1,15 @@
 import '../App.css';
 import { useRef, useState } from 'react';   
-import axios from 'axios'
+import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 const Home = () => {
+
+    let navigate = useNavigate();
 
     const [usernameReg, setUsernameReg] = useState('');
     const [passwordReg, setPasswordReg] = useState('');
@@ -20,6 +23,16 @@ const Home = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+      };
+
+      const swapCreate = () => {
+        createFormRef.current.classList.add('form--hidden');
+        loginFormRef.current.classList.remove('form--hidden');
+      };
+
+      const swapLogin = () => {
+        createFormRef.current.classList.remove('form--hidden');
+        loginFormRef.current.classList.add('form--hidden');
       };
 
     function createUser() {
@@ -39,10 +52,21 @@ const Home = () => {
         });
     };
 
+    function login() {
+        axios.post('http://localhost:3001/login', {
+            username: usernameLog,
+            password: passwordLog,
+        }).then((response) => {
+            if (response) {
+                navigate(`/User/${usernameLog}`);
+            };
+        });
+    };
+
     return (
         <Container id='container' className='d-grid h-100'>
             <Form onSubmit={handleSubmit} id='form--width' className='text-center w-100' ref={createFormRef}>
-                <h6>sign up</h6>
+                <h6>make</h6>
                 <Form.Group>
                     <Form.Label>username</Form.Label>
                     <Form.Control type='username' size='sm'onChange={(event) => {setUsernameReg(event.target.value)}}/>
@@ -58,10 +82,14 @@ const Home = () => {
                 <div>
                 <Button variant='primary' size='sm' onClick={createUser}>make</Button>
                 </div>
+                <div>
+                    <Button variant='primary' size='sm' onClick={swapCreate}>log</Button>
+                </div>
                 <p className='form--hidden' ref={passWarningRef}>passwords don't match</p>
             </Form>
 
             <Form id='form--width' className='text-center w-100 form--hidden' ref={loginFormRef}>
+            <h6>log</h6>
                 <Form.Group>
                     <Form.Label>username</Form.Label>
                     <Form.Control type='username' size='sm'onChange={(event) => {setUsernameLog(event.target.value)}}/>
@@ -71,7 +99,10 @@ const Home = () => {
                     <Form.Control type='password' size='sm' onChange={(event) => {setPasswordLog(event.target.value)}}/> 
                 </Form.Group>
                 <div>
-                <Button variant='primary' size='sm'>log</Button>
+                <Button variant='primary' size='sm' onClick={login}>log</Button>
+                </div>
+                <div>
+                    <Button variant='primary' size='sm' onClick={swapLogin}>make</Button>
                 </div>
             </Form>
         </Container>

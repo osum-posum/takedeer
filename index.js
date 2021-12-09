@@ -40,15 +40,32 @@ app.post('/create', (request, response) => {
 
         db.query(insertQuery, (error, result) => {
             if (error){
-                console.log
+                console.log(error)
             } else {
                 return res.render('register', {message: 'user created'})
             };
         });
+    });
+});
 
+app.post('/login', (request, response) => {
+    const { username, password } = request.body;
+    const sqlSearch = "SELECT * FROM userstable WHERE username = ? AND password = ?";
+    const searchQuery = mysql.format(sqlSearch, [username, password]);
+
+    db.query(searchQuery, (error, result) => {
+        if (error) {
+           return console.log(error)
+        };
+
+        if (result.length > 0) {
+            response.send(result);
+        } else {
+            console.log({message: 'wrong user'})
+        }
     });
 });
 
 app.listen(PORT, () => {
-    console.log({message: "server running"});
+    console.log({message: 'server running'});
 });
