@@ -4,6 +4,7 @@ import axios from 'axios'
 
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 const Home = () => {
 
@@ -23,23 +24,25 @@ const Home = () => {
 
     function createUser() {
 
+        if (passwordReg !== confirmPassword) {
+            passWarningRef.current.classList.remove('form--hidden')
+        } else {
+            passWarningRef.current.classList.add('form--hidden')
+        };
+
         axios.post('http://localhost:3001/create', {
             username: usernameReg,
             password: passwordReg,
             confirmPassword: confirmPassword,
+        }).then(() => {
+            console.log('success');
         });
-
-        // if (usernameReg !== confirmPassword) {
-        //     passWarningRef.current.classList.remove('form--hidden')
-        // } else {
-        //     passWarningRef.current.classList.add('form--hidden')
-        // };
     };
 
     return (
         <Container id='container' className='d-grid h-100'>
             <Form onSubmit={handleSubmit} id='form--width' className='text-center w-100' ref={createFormRef}>
-                <h8>sign up</h8>
+                <h6>sign up</h6>
                 <Form.Group>
                     <Form.Label>username</Form.Label>
                     <Form.Control type='username' size='sm'onChange={(event) => {setUsernameReg(event.target.value)}}/>
@@ -50,11 +53,15 @@ const Home = () => {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>confirm password</Form.Label>
-                    <Form.Control type='password' size='sm' onCHange={(event) => {setConfirmPassword(event.target.value)}}/> 
+                    <Form.Control type='password' size='sm' onChange={(event) => {setConfirmPassword(event.target.value)}}/> 
                 </Form.Group>
+                <div>
+                <Button variant='primary' size='sm' onClick={createUser}>make</Button>
+                </div>
+                <p className='form--hidden' ref={passWarningRef}>passwords don't match</p>
             </Form>
 
-            <Form id='form--width' className='text-center w-100 form--hidden' ref={createFormRef}>
+            <Form id='form--width' className='text-center w-100 form--hidden' ref={loginFormRef}>
                 <Form.Group>
                     <Form.Label>username</Form.Label>
                     <Form.Control type='username' size='sm'onChange={(event) => {setUsernameLog(event.target.value)}}/>
@@ -63,6 +70,9 @@ const Home = () => {
                     <Form.Label>password</Form.Label>
                     <Form.Control type='password' size='sm' onChange={(event) => {setPasswordLog(event.target.value)}}/> 
                 </Form.Group>
+                <div>
+                <Button variant='primary' size='sm'>log</Button>
+                </div>
             </Form>
         </Container>
     );

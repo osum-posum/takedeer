@@ -18,21 +18,28 @@ const db = mysql.createConnection({
 
 app.post('/create', (request, response) => {
     const { username, password, confirmPassword } = request.body;
-    const sqlSearchUsername = "SELECT * FROM userstable WHERE username = ?";
-    const sqlSearchPassword = "SELECT * FROM userstable WHERE password = ?";
-    const searchUsernameQuery = mysql.format(sqlSearchUsername, [username]);
+    const sqlSearch = "SELECT * FROM userstable WHERE username = ?";
+    const sqlInsert = "INSERT INTO userstable WHERE (username, password) VALUES (?, ?)";
+    const searchQuery = mysql.format(sqlSearch, [username]);
+    const insertQuery = mysql.format(sqlInsert, [username, password]);
 
-    db.query(searchUsernameQuery, (error, result) => {
+    db.query(searchUsernameQuery, async(error, result) => {
         if (error) {
             return console.log(error);
         };
+
         if (result.length > 0) {
-            return console.log({message: "user already exists"})
-        }
+            return console.log({message: "user already exists"});
+        };
 
         if (password !== confirmPassword) {
-            return console.log({message: "passwords don't match"})
-        }
+            return console.log({message: "passwords don't match"});
+        };
+
+        let hashedPassword = await bcrypt.hash(password, 10);
+
+        db.query()
+
     });
 });
 
