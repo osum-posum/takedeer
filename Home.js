@@ -17,6 +17,8 @@ const Home = () => {
     const [usernameLog, setUsernameLog] = useState('');
     const [passwordLog, setPasswordLog] = useState('');
 
+    const [loginStatus, setLoginStatus] = useState('');
+
     const createFormRef = useRef(null);
     const loginFormRef = useRef(null);
     const passWarningRef = useRef(null);
@@ -34,6 +36,8 @@ const Home = () => {
         createFormRef.current.classList.remove('form--hidden');
         loginFormRef.current.classList.add('form--hidden');
       };
+
+      axios.defaults.withCredentials = true;
 
     function createUser() {
 
@@ -57,8 +61,14 @@ const Home = () => {
             username: usernameLog,
             password: passwordLog,
         }).then((response) => {
-            if (response) {
-                navigate(`/User/${usernameLog}`);
+            if (response.data.message) {
+                setLoginStatus(response.data.message);
+                console.log(response.data.message)
+            } else {
+                setLoginStatus(response.data[0].username);
+                console.log('pushed')
+                //TODO: navigate for when user is logged in
+                navigate(`/User/${loginStatus}`);
             };
         });
     };
