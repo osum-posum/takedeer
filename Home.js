@@ -1,5 +1,8 @@
+// -- takedeer.com -- //
+
+// inmport variables //
 import '../App.css';
-import { useRef, useState } from 'react';   
+import { useRef, useState, useEffect } from 'react';   
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 
@@ -7,8 +10,10 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
+// Entire Component { variables, functions, etc. }
 const Home = () => {
 
+    // used to push user to new page
     let navigate = useNavigate();
 
     const [usernameReg, setUsernameReg] = useState('');
@@ -25,20 +30,21 @@ const Home = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-      };
+    };
 
       const swapCreate = () => {
         createFormRef.current.classList.add('form--hidden');
         loginFormRef.current.classList.remove('form--hidden');
-      };
+    };
 
       const swapLogin = () => {
         createFormRef.current.classList.remove('form--hidden');
         loginFormRef.current.classList.add('form--hidden');
-      };
+    };
 
-      axios.defaults.withCredentials = true;
+    axios.defaults.withCredentials = true;
 
+    // Function --> creates user 
     function createUser() {
 
         if (passwordReg !== confirmPassword) {
@@ -56,8 +62,9 @@ const Home = () => {
         });
     };
 
+    // Function --> logs user in 
     function login() {
-        axios.post('http://localhost:3001/login', {
+        axios.post('http://localhost:3001/login:id', {
             username: usernameLog,
             password: passwordLog,
         }).then((response) => {
@@ -66,13 +73,25 @@ const Home = () => {
                 console.log(response.data.message)
             } else {
                 setLoginStatus(response.data[0].username);
-                console.log('pushed')
+                console.log(response.data[0].username)
+                console.log({message: 'pushed'});
                 //TODO: navigate for when user is logged in
-                navigate(`/User/${loginStatus}`);
-            };
+                navigate(`/User/${response.data[0].username}`);
+            }
         });
     };
 
+    // Function --> sets loginStatus for useState(); 
+    useEffect(() => {
+        axios.get('http://localhost:3001/login').then((response) => {
+            if (response.data.loggedIn === true) {
+                setLoginStatus(response.data.user[0].username);
+                console.log(response.data);
+            }
+        });
+    }, []);
+
+    // Front End Componant 
     return (
         <Container id='container' className='d-grid h-100'>
             <Form onSubmit={handleSubmit} id='form--width' className='text-center w-100' ref={createFormRef}>
