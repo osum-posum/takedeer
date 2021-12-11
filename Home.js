@@ -106,7 +106,9 @@ const Home = () => {
 
     // Front End Componant 
     return (
-        <Container className='container d-grid h-100 justify-content-center text-justify'>
+        <Container className='d-grid h-100 justify-content-center text-justify'>
+
+            {/* HEADER */}
             <Row className='align-items-end'>
                 <Col>
                     <h5>
@@ -115,29 +117,44 @@ const Home = () => {
                     <small><p>keep track of your finances.</p></small>
                 </Col>
             </Row>
-            <Row className='align-items-center' ref={createFormRef} md>
-                <Form onSubmit={handleSubmit} id='form--css' className='text-center w-100' >
+
+            {/* cREATE Form */}
+            <Row id='container' className='' ref={createFormRef} md>
+                <Form onSubmit={handleSubmit} id='form--css' className='text-center form-inline' >
                 <div className='space'></div>
                     <h6 className='pink'>make</h6>
                     <div className='space'></div>
-                    <Col>
+                    <Col >
                         <Form.Group>
                             <Form.Label>user</Form.Label>
-                            <Form.Control className='input--css' type='username' size='sm'onChange={(event) => {setUsernameReg(event.target.value)}}/>
+                        </Form.Group>
+                    </Col>
+                    <Col className='offset-md-2'>
+                        <Form.Group>
+                            <Form.Control className='input--css' type='username' onChange={(event) => {setUsernameReg(event.target.value)}}/>
                         </Form.Group>
                     </Col>
                     <Col>
                         <Form.Group>
                             <Form.Label>pass</Form.Label>
-                            <Form.Control className='input--css' type='password' size='sm' onChange={(event) => {setPasswordReg(event.target.value)}}/> 
                         </Form.Group>
                     </Col>
-                    <Col>
+                    <Col  className='offset-md-2'>
+                        <Form.Group>
+                            <Form.Control className='input--css' type='password' onChange={(event) => {setPasswordReg(event.target.value)}}/> 
+                        </Form.Group>
+                    </Col>
+                    <Col >
                         <Form.Group>
                             <Form.Label>confirm</Form.Label>
-                            <Form.Control className='input--css' type='password' size='sm' onChange={(event) => {setConfirmPassword(event.target.value)}}/> 
                         </Form.Group>
                     </Col>
+                    <Col className='offset-md-2'>
+                        <Form.Group>
+                            <Form.Control className='input--css' type='password' onChange={(event) => {setConfirmPassword(event.target.value)}}/> 
+                        </Form.Group>
+                    </Col>
+
                     <Row className='justify-content-center'>
                         <div className='space'></div>
                         <Button variant='sharp' size='sm' onClick={createUser}>make</Button>
@@ -151,23 +168,33 @@ const Home = () => {
                 </Form>
             </Row>
             
-            <Row ref={loginFormRef} className='form--hidden align-items-center' md>
+            {/* Login fORM */}
+            <Row ref={loginFormRef} id='container' className='form--hidden' md>
                 <Form onSubmit={handleSubmit} id='form--css' className='text-center w-100' >
                 <div className='space'></div>
                 <h6 className='pink'>log</h6>
                 <div className='space'></div>
-                    <Col md>
-                    <Form.Group>
-                        <Form.Label>user</Form.Label>
-                        <Form.Control className='input--css' type='username' size='sm'onChange={(event) => {setUsernameLog(event.target.value)}}/>
-                    </Form.Group>
+                    <Col >
+                        <Form.Group>
+                            <Form.Label>user</Form.Label>
+                        </Form.Group>
                     </Col>
-                    <Col md>
-                    <Form.Group>
-                        <Form.Label>pass</Form.Label>
-                        <Form.Control className='input--css' type='password' size='sm' onChange={(event) => {setPasswordLog(event.target.value)}}/>
-                    </Form.Group>
+                    <Col>
+                        <Form.Group className='offset-md-2'>
+                            <Form.Control className='input--css' type='username' onChange={(event) => {setUsernameLog(event.target.value)}}/>
+                        </Form.Group>
                     </Col>
+                    <Col >
+                        <Form.Group>
+                            <Form.Label>pass</Form.Label>
+                        </Form.Group>
+                    </Col>
+                    <Col className='offset-md-2'>
+                        <Form.Group>
+                            <Form.Control className='input--css' type='password' onChange={(event) => {setPasswordLog(event.target.value)}}/>
+                        </Form.Group>
+                    </Col>
+                    
                     <Row className='justify-content-center'>
                         <div className='space'></div>
                         <Button variant='sharp' id='' size='sm' onClick={login}>log</Button>
@@ -180,6 +207,8 @@ const Home = () => {
                     <div className='space'></div>
                 </Form>
             </Row>
+
+            {/* FOOTER */}
             <Row className='align-items-start'>
                 <Col>
                     <footer>
