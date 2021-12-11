@@ -1,7 +1,11 @@
+// TODO: it is not detecting req.session.user for the log in state
+
+// Server Variables 
 const mysql = require('mysql');
 const express = require('express');
 const cors = require('cors');
 
+// Password Variables
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -19,7 +23,6 @@ const corsOptions = {
     origin: ['http://localhost:3000'],
     methods: ['GET', 'POST'],
     credentials: true,
-    optionSuccessStatus: [200],
 };
 app.use(cors(corsOptions));
 
@@ -42,8 +45,8 @@ const db = mysql.createConnection({
     database: 'users',
 });
 
-app.post('/create', (request, response) => {
-    const { username, password, confirmPassword } = request.body;
+app.post('/create', (req, res) => {
+    const { username, password, confirmPassword } = req.body;
     const sqlSearch = "SELECT * FROM userstable WHERE username = ?";
     const sqlInsert = "INSERT INTO userstable (username, password) VALUES (?, ?)";
     const searchQuery = mysql.format(sqlSearch, [username]);
@@ -80,7 +83,7 @@ const verifyJWT = (req, res, next) => {
     if (!token) {
         res.send('need token')
     } else {
-        jwt.verify(token, 'dotenvfileEsecret', (error, decoded) => {
+        jwt.verify(token, 'mySecret', (error, decoded) => {
             if (error) {
                 res.json({auth: false, message: 'failed to authorize'})
             } else {
@@ -97,14 +100,17 @@ app.get('authentication', verifyJWT, (req, res) => {
 });
 
 app.get('/login', (req, res) => {
+    console.log(req.session.user)
     if (req.session.user) {
         res.send({ loggedIn: true, user: req.session.user });
+        console.log({message: 'logged in = true'})
     } else {
         res.send({ loggedIn: false });
-    };
+        console.log({message: 'logged in = false'})
+    }
 });
 
-app.post('/login', (req, res) => {
+app.post('/login:id', (req, res) => {
     const { username, password } = req.body;
     const sqlSearch = "SELECT * FROM userstable WHERE username = ?";
     const searchQuery = mysql.format(sqlSearch, [username]);
@@ -118,19 +124,20 @@ app.post('/login', (req, res) => {
             bcrypt.compare(password, result[0].password, (error, response) => {
                 if (response) {
                     const id = result[0].id;
-                    const token = jwt.sign({id}, 'dotenvfileSecret', {
+                    const token = jwt.sign({id}, 'mySecret', {
                         expiresIn: 300,
                     });
                     req.session.user = result;
                     console.log(req.session.user)
+                    res.send(result);
 
                     res.json({auth: true, token: token, result: result});
                     console.log(result)
-                };
+                }
             });
             res.send(result);
         } else {
-            console.log({message: 'wrong user'})
+            res.send({message: 'wrong user'})
         };
     });
 });

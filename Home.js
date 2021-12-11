@@ -1,14 +1,16 @@
 // -- takedeer.com -- //
 
+//TODOS:
+// -- resize row 2 to stay the same size and never change when swaping forms
+
+
 // inmport variables //
-import '../App.css';
+import '../css/App.css';
 import { useRef, useState, useEffect } from 'react';   
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 
-import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 
 // Entire Component { variables, functions, etc. }
 const Home = () => {
@@ -27,19 +29,36 @@ const Home = () => {
     const createFormRef = useRef(null);
     const loginFormRef = useRef(null);
     const passWarningRef = useRef(null);
+    const userWarningRef = useRef(null);
 
     const handleSubmit = (event) => {
         event.preventDefault();
     };
 
-      const swapCreate = () => {
+    const swapCreate = () => {
+        const passWarn = passWarningRef.current;
+        const createForm = createFormRef.current;
+        const loginForm = loginFormRef.current;
+
+        if (passWarn.className !== 'form--hidden'){
+            passWarn.classList.add('form--hidden');
+        };
+
         createFormRef.current.classList.add('form--hidden');
         loginFormRef.current.classList.remove('form--hidden');
     };
 
       const swapLogin = () => {
-        createFormRef.current.classList.remove('form--hidden');
-        loginFormRef.current.classList.add('form--hidden');
+        const userWarn = userWarningRef.current
+        const createForm = createFormRef.current
+        const loginForm = loginFormRef.current
+
+        if (userWarn.className !== 'form--hidden'){
+            userWarn.classList.add('form--hidden');
+        };
+
+        createForm.classList.remove('form--hidden');
+        loginForm.classList.add('form--hidden');
     };
 
     axios.defaults.withCredentials = true;
@@ -53,6 +72,10 @@ const Home = () => {
             passWarningRef.current.classList.add('form--hidden')
         };
 
+        if (passwordReg || confirmPassword === ''){
+            return console.log('blank inputs')
+        };
+
         axios.post('http://localhost:3001/create', {
             username: usernameReg,
             password: passwordReg,
@@ -62,78 +85,108 @@ const Home = () => {
         });
     };
 
-    // Function --> logs user in 
+    // Function --> logs user in // sets status of logged in
     function login() {
         axios.post('http://localhost:3001/login:id', {
             username: usernameLog,
             password: passwordLog,
         }).then((response) => {
             if (response.data.message) {
-                setLoginStatus(response.data.message);
                 console.log(response.data.message)
+                userWarningRef.current.classList.remove('form--hidden');
             } else {
-                setLoginStatus(response.data[0].username);
                 console.log(response.data[0].username)
                 console.log({message: 'pushed'});
+
                 //TODO: navigate for when user is logged in
                 navigate(`/User/${response.data[0].username}`);
             }
         });
     };
 
-    // Function --> sets loginStatus for useState(); 
-    useEffect(() => {
-        axios.get('http://localhost:3001/login').then((response) => {
-            if (response.data.loggedIn === true) {
-                setLoginStatus(response.data.user[0].username);
-                console.log(response.data);
-            }
-        });
-    }, []);
-
     // Front End Componant 
     return (
-        <Container id='container' className='d-grid h-100'>
-            <Form onSubmit={handleSubmit} id='form--width' className='text-center w-100' ref={createFormRef}>
-                <h6>make</h6>
-                <Form.Group>
-                    <Form.Label>username</Form.Label>
-                    <Form.Control type='username' size='sm'onChange={(event) => {setUsernameReg(event.target.value)}}/>
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>password</Form.Label>
-                    <Form.Control type='password' size='sm' onChange={(event) => {setPasswordReg(event.target.value)}}/> 
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>confirm password</Form.Label>
-                    <Form.Control type='password' size='sm' onChange={(event) => {setConfirmPassword(event.target.value)}}/> 
-                </Form.Group>
-                <div>
-                <Button variant='primary' size='sm' onClick={createUser}>make</Button>
-                </div>
-                <div>
-                    <Button variant='primary' size='sm' onClick={swapCreate}>log</Button>
-                </div>
-                <p className='form--hidden' ref={passWarningRef}>passwords don't match</p>
-            </Form>
-
-            <Form id='form--width' className='text-center w-100 form--hidden' ref={loginFormRef}>
-            <h6>log</h6>
-                <Form.Group>
-                    <Form.Label>username</Form.Label>
-                    <Form.Control type='username' size='sm'onChange={(event) => {setUsernameLog(event.target.value)}}/>
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>password</Form.Label>
-                    <Form.Control type='password' size='sm' onChange={(event) => {setPasswordLog(event.target.value)}}/> 
-                </Form.Group>
-                <div>
-                <Button variant='primary' size='sm' onClick={login}>log</Button>
-                </div>
-                <div>
-                    <Button variant='primary' size='sm' onClick={swapLogin}>make</Button>
-                </div>
-            </Form>
+        <Container className='container d-grid h-100 justify-content-center text-justify'>
+            <Row className='align-items-end'>
+                <Col>
+                    <h5>
+                        <small><p>welcome to <span>takedeer.com </span></p></small>
+                    </h5>
+                    <small><p>keep track of your finances.</p></small>
+                </Col>
+            </Row>
+            <Row className='align-items-center' ref={createFormRef} md>
+                <Form onSubmit={handleSubmit} id='form--css' className='text-center w-100' >
+                <div className='space'></div>
+                    <h6 className='pink'>make</h6>
+                    <div className='space'></div>
+                    <Col>
+                        <Form.Group>
+                            <Form.Label>user</Form.Label>
+                            <Form.Control className='input--css' type='username' size='sm'onChange={(event) => {setUsernameReg(event.target.value)}}/>
+                        </Form.Group>
+                    </Col>
+                    <Col>
+                        <Form.Group>
+                            <Form.Label>pass</Form.Label>
+                            <Form.Control className='input--css' type='password' size='sm' onChange={(event) => {setPasswordReg(event.target.value)}}/> 
+                        </Form.Group>
+                    </Col>
+                    <Col>
+                        <Form.Group>
+                            <Form.Label>confirm</Form.Label>
+                            <Form.Control className='input--css' type='password' size='sm' onChange={(event) => {setConfirmPassword(event.target.value)}}/> 
+                        </Form.Group>
+                    </Col>
+                    <Row className='justify-content-center'>
+                        <div className='space'></div>
+                        <Button variant='sharp' size='sm' onClick={createUser}>make</Button>
+                        <div className='space'></div>
+                        <Button variant='sharp' size='sm' onClick={swapCreate}>log</Button>
+                    </Row>
+                    <div className='space'>
+                    <p className='form--hidden pink' ref={passWarningRef}>passwords don't match</p>
+                    </div>
+                    <div className='space'></div>
+                </Form>
+            </Row>
+            
+            <Row ref={loginFormRef} className='form--hidden align-items-center' md>
+                <Form onSubmit={handleSubmit} id='form--css' className='text-center w-100' >
+                <div className='space'></div>
+                <h6 className='pink'>log</h6>
+                <div className='space'></div>
+                    <Col md>
+                    <Form.Group>
+                        <Form.Label>user</Form.Label>
+                        <Form.Control className='input--css' type='username' size='sm'onChange={(event) => {setUsernameLog(event.target.value)}}/>
+                    </Form.Group>
+                    </Col>
+                    <Col md>
+                    <Form.Group>
+                        <Form.Label>pass</Form.Label>
+                        <Form.Control className='input--css' type='password' size='sm' onChange={(event) => {setPasswordLog(event.target.value)}}/>
+                    </Form.Group>
+                    </Col>
+                    <Row className='justify-content-center'>
+                        <div className='space'></div>
+                        <Button variant='sharp' id='' size='sm' onClick={login}>log</Button>
+                        <div className='space'></div>
+                        <Button variant='sharp' size='sm' onClick={swapLogin}>make</Button>
+                    </Row>
+                    <div className='space'>
+                    <p className='form--hidden pink' ref={userWarningRef}>wrong username/ password</p>
+                    </div>
+                    <div className='space'></div>
+                </Form>
+            </Row>
+            <Row className='align-items-start'>
+                <Col>
+                    <footer>
+                        <small><p>site created by <span>Chavez, </span> 2021.</p></small>
+                    </footer>
+                </Col>
+            </Row>
         </Container>
     );
 };
