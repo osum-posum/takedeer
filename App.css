@@ -1,8 +1,10 @@
+
 body {
   display: grid;
   background-color: #DBD3D8;
   color: #2E5E4E;
   min-height: 100vh;
+  min-width: 100%;
 }
 
 p{
@@ -58,6 +60,10 @@ span{
   100% { color: #2E5E4E;}
 }
 
+.polka{
+  background-image: radial-gradient(circle, black 20%, white 0%);
+  background-size:2% 200%;
+}
 
 .input--css{
   color: #F43B86;
@@ -93,7 +99,7 @@ span{
 
 .btn-sharp {
   background-color: #2E5E4E;
-  width: 100px;
+  width: 80px;
   border-radius: 0%;
   color: #F43B86;
 }
