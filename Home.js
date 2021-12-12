@@ -3,7 +3,6 @@
 //TODOS:
 // -- resize row 2 to stay the same size and never change when swaping forms
 
-
 // inmport variables //
 import '../css/App.css';
 import { useRef, useState, useEffect } from 'react';   
@@ -17,7 +16,11 @@ const Home = () => {
 
     // used to push user to new page
     let navigate = useNavigate();
+    
+    // hid variable for form--hidden css
+    let hid = 'form--hidden'
 
+    // state variables
     const [usernameReg, setUsernameReg] = useState('');
     const [passwordReg, setPasswordReg] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,56 +29,68 @@ const Home = () => {
 
     const [loginStatus, setLoginStatus] = useState('');
 
+    // ref variables 
     const createFormRef = useRef(null);
     const loginFormRef = useRef(null);
     const passWarningRef = useRef(null);
     const userWarningRef = useRef(null);
 
+    // function prevents default submit form action
     const handleSubmit = (event) => {
         event.preventDefault();
     };
 
+    // changes the create form to the login form
     const swapCreate = () => {
         const passWarn = passWarningRef.current;
         const createForm = createFormRef.current;
         const loginForm = loginFormRef.current;
 
-        if (passWarn.className !== 'form--hidden'){
-            passWarn.classList.add('form--hidden');
+        if (passWarn.className !== hid){
+            passWarn.classList.add(hid);
         };
 
-        createFormRef.current.classList.add('form--hidden');
-        loginFormRef.current.classList.remove('form--hidden');
+        if (createForm.className !== hid){
+            createForm.classList.add(hid);
+            loginForm.classList.remove(hid);
+        };
     };
 
-      const swapLogin = () => {
+    // changes the login form to the create form
+    const swapLogin = () => {
         const userWarn = userWarningRef.current
         const createForm = createFormRef.current
         const loginForm = loginFormRef.current
 
-        if (userWarn.className !== 'form--hidden'){
-            userWarn.classList.add('form--hidden');
+        if (userWarn.className !== hid){
+            userWarn.classList.add(hid);
         };
 
-        createForm.classList.remove('form--hidden');
-        loginForm.classList.add('form--hidden');
+        if (loginForm.className !== hid)
+        createForm.classList.remove(hid);
+        loginForm.classList.add(hid);
     };
 
     axios.defaults.withCredentials = true;
 
     // Function --> creates user 
     function createUser() {
+        // variable for the current ref
+        const passWarn = passWarningRef.current
 
+        // if password value does not = confirm passord value we show pass warning else we take it away
         if (passwordReg !== confirmPassword) {
-            passWarningRef.current.classList.remove('form--hidden')
+            passWarn.classList.remove(hid)
         } else {
-            passWarningRef.current.classList.add('form--hidden')
+            passWarn.classList.add(hid)
         };
 
-        if (passwordReg || confirmPassword === ''){
+        // if any of the input values are blank we stop the function 
+        if (!passwordReg.trim() || !confirmPassword.trim() || usernameReg.trim()){
             return console.log('blank inputs')
         };
 
+        // sends request to server to create the user
         axios.post('http://localhost:3001/create', {
             username: usernameReg,
             password: passwordReg,
@@ -87,13 +102,20 @@ const Home = () => {
 
     // Function --> logs user in // sets status of logged in
     function login() {
+        const userWarn = userWarningRef.current
+        
+        // if password or user inputs are input we stop the function
+        if (!passwordLog.trim() || !usernameLog.trim()){
+            return console.log('blank user or pass')
+        };
+
         axios.post('http://localhost:3001/login:id', {
             username: usernameLog,
             password: passwordLog,
         }).then((response) => {
             if (response.data.message) {
                 console.log(response.data.message)
-                userWarningRef.current.classList.remove('form--hidden');
+                userWarn.classList.remove(hid);
             } else {
                 console.log(response.data[0].username)
                 console.log({message: 'pushed'});
@@ -154,7 +176,8 @@ const Home = () => {
                             <Form.Control className='input--css' type='password' onChange={(event) => {setConfirmPassword(event.target.value)}}/> 
                         </Form.Group>
                     </Col>
-
+                    
+                    {/* BUTTON ROW */}
                     <Row className='justify-content-center'>
                         <div className='space'></div>
                         <Button variant='sharp' size='sm' onClick={createUser}>make</Button>
@@ -194,7 +217,8 @@ const Home = () => {
                             <Form.Control className='input--css' type='password' onChange={(event) => {setPasswordLog(event.target.value)}}/>
                         </Form.Group>
                     </Col>
-                    
+
+                    {/* BUTTON ROW */}
                     <Row className='justify-content-center'>
                         <div className='space'></div>
                         <Button variant='sharp' id='' size='sm' onClick={login}>log</Button>
@@ -212,7 +236,7 @@ const Home = () => {
             <Row className='align-items-start'>
                 <Col>
                     <footer>
-                        <small><p>site created by <span>Chavez, </span> 2021.</p></small>
+                        <small><p>site by <span>Chavez.</span></p></small>
                     </footer>
                 </Col>
             </Row>
