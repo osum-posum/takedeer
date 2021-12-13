@@ -60,15 +60,48 @@ span{
   100% { color: #2E5E4E;}
 }
 
+.tbody{
+  overflow-y: scroll;
+  min-height: 10px;
+}
+
+.table--style{
+  border: 1px solid #2E5E4E;
+  color: #2E5E4E;
+}
+
+.table--bro {
+  width: 2% !important;
+}
+
+.flex--v{
+  display: flex;
+  align-items: center;
+}
+
 .polka{
   background-image: radial-gradient(circle, black 20%, white 0%);
   background-size:2% 200%;
 }
 
+.input--css2{
+  color: #F43B86;
+  height: 25px;
+  border: none;
+  margin: 6px;
+  padding: 2px;
+}
+
+.input--css2:focus{
+  outline: none;
+}
+
 .input--css{
   color: #F43B86;
   border-radius: 0%;
+  border: none;
   width: 80%;
+  max-width: fit-content;
   height: 25px;
 }
 
