@@ -27,8 +27,6 @@ const Home = () => {
     const [usernameLog, setUsernameLog] = useState('');
     const [passwordLog, setPasswordLog] = useState('');
 
-    const [loginStatus, setLoginStatus] = useState('');
-
     // ref variables 
     const createFormRef = useRef(null);
     const loginFormRef = useRef(null);
@@ -86,7 +84,7 @@ const Home = () => {
         };
 
         // if any of the input values are blank we stop the function 
-        if (!passwordReg.trim() || !confirmPassword.trim() || usernameReg.trim()){
+        if (!passwordReg.trim() || !confirmPassword.trim() || !usernameReg.trim()){
             return console.log('blank inputs')
         };
 
@@ -103,9 +101,11 @@ const Home = () => {
     // Function --> logs user in // sets status of logged in
     function login() {
         const userWarn = userWarningRef.current
+
         
         // if password or user inputs are input we stop the function
         if (!passwordLog.trim() || !usernameLog.trim()){
+            userWarn.classList.remove(hid)
             return console.log('blank user or pass')
         };
 
@@ -114,14 +114,14 @@ const Home = () => {
             password: passwordLog,
         }).then((response) => {
             if (response.data.message) {
-                console.log(response.data.message)
+                console.log(response)
                 userWarn.classList.remove(hid);
             } else {
-                console.log(response.data[0].username)
+                console.log(response.data.result[0].username)
                 console.log({message: 'pushed'});
 
                 //TODO: navigate for when user is logged in
-                navigate(`/User/${response.data[0].username}`);
+                navigate(`/User/${response.data.result[0].username}`);
             }
         });
     };

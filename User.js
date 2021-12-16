@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router';
 
 const User = ({ item, spent, net, date }) => {
 
+    axios.defaults.withCredentials = true;
+
     const [name, setName] = useState('');
 
     const [list, setList]= useState({
@@ -13,11 +15,6 @@ const User = ({ item, spent, net, date }) => {
         net: 0,
         date: new Date()
     });
-
-    const addItem = () => {
-        console.log(list)
-        console.log('im working')
-    }
     
     const handleChange = (e) => {
         setList({
@@ -25,8 +22,6 @@ const User = ({ item, spent, net, date }) => {
             [e.target.name]: e.target.value
         });
     };
-    
-    axios.defaults.withCredentials = true;
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -41,6 +36,16 @@ const User = ({ item, spent, net, date }) => {
             }
         });
     }, []);
+
+    function addItem(e) {
+        axios.post('http://localhost:3001/add-item', {
+            ...list,
+            [e.target.name]: e.target.value,
+            username: name
+        }).then((response) => {
+            console.log(response)
+        });
+    };
 
     return (
         <div className='container'>

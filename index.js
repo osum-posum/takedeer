@@ -128,18 +128,36 @@ app.post('/login:id', (req, res) => {
                         expiresIn: 300,
                     });
                     req.session.user = result;
-                    console.log(req.session.user)
-                    res.send(result);
 
-                    res.json({auth: true, token: token, result: result});
-                    console.log(result)
-                }
+                    const responseData = {
+                        auth: true, 
+                        token: token, 
+                        result: result
+                    }
+
+                    // const jsonContent = JSON.stringify(responseData);
+                    // res.status(201);
+                    return res.json(responseData);
+                };
             });
-            res.send(result);
         } else {
             res.send({message: 'wrong user'})
         };
     });
+});
+
+app.post('/add-item', (req, res) => {
+    const { item, spent, net, date, username } = req.body;
+    const sqlInsert = "INSERT INTO itemstable (item, spent, net, date, username) VALUES (?, ?, ?, ?, ?)";
+    const insertQuery = mysql.format(sqlInsert, [item, spent, net, date, username]);
+
+    db.query(insertQuery, (error, result) => {
+        if (error) {
+            return console.log(error)
+        };
+
+        res.send(result)
+    })
 });
 
 app.listen(PORT, () => {
