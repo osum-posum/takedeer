@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 
-const User = ({ item, spent, net, date }) => {
+const User = () => {
 
     axios.defaults.withCredentials = true;
 
     const [name, setName] = useState('');
+
+    const [itemsList, setItemsList] = useState('');
 
     const [list, setList]= useState({
         item: '',
@@ -27,6 +29,17 @@ const User = ({ item, spent, net, date }) => {
         event.preventDefault();
     };
 
+    // gets the users items 
+    const findItems = () => {
+        axios.post('http://localhost:3001/find-items', {
+            username: name
+        }).then((response) => {
+            setItemsList(response.data);
+            console.log(response.data);
+            console.log(name)
+        });
+    };
+ 
     // function sets users name
     useEffect(() => {
         axios.get('http://localhost:3001/login').then((response) => {
@@ -74,6 +87,7 @@ const User = ({ item, spent, net, date }) => {
                             <input onChange={handleChange} name='date' type='date' className='input--css2'></input>
 
                             <button onClick={addItem} className='btn-sharp'>enter</button>
+                            <button onClick={findItems} className='btn-sharp'>find</button>
                         </div>
                     </form>
                 </div>
@@ -87,6 +101,7 @@ const User = ({ item, spent, net, date }) => {
                             <th className='table--bro' scope='col'>spent</th>
                             <th className='table--bro' scope='col'>net</th>
                             <th className='table--bro' scope='col'>date</th>
+                            <th className='table--bro' scope='col'>edit/del</th>
                         </tr>
                     </thead>
                     <tbody className='tbody'>

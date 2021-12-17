@@ -50,7 +50,6 @@ app.post('/create', (req, res) => {
     const sqlSearch = "SELECT * FROM userstable WHERE username = ?";
     const sqlInsert = "INSERT INTO userstable (username, password) VALUES (?, ?)";
     const searchQuery = mysql.format(sqlSearch, [username]);
-    const insertQuery = mysql.format(sqlInsert, [username, password]);
 
     db.query(searchQuery, async(error, result) => {
         if (error) {
@@ -66,13 +65,14 @@ app.post('/create', (req, res) => {
         };
 
         let hashedPassword = await bcrypt.hash(password, 10);
+        const insertQuery = mysql.format(sqlInsert, [username, hashedPassword]);
 
         db.query(insertQuery, (error, result) => {
             if (error){
                 console.log(error)
             } else {
                 return res.render('register', {message: 'user created'})
-            };
+            }
         });
     });
 });
@@ -100,9 +100,10 @@ app.get('authentication', verifyJWT, (req, res) => {
 });
 
 app.get('/login', (req, res) => {
+
     console.log(req.session.user)
     if (req.session.user) {
-        res.send({ loggedIn: true, user: req.session.user });
+        res.send({ loggedIn: true, user: req.session.user});
         console.log({message: 'logged in = true'})
     } else {
         res.send({ loggedIn: false });
@@ -133,16 +134,32 @@ app.post('/login:id', (req, res) => {
                         auth: true, 
                         token: token, 
                         result: result
-                    }
+                    };
 
-                    // const jsonContent = JSON.stringify(responseData);
-                    // res.status(201);
                     return res.json(responseData);
-                };
+                }
             });
         } else {
             res.send({message: 'wrong user'})
         };
+    });
+});
+
+app.post('/find-items', (req, res) => {
+    const username = req.body.username;
+    console.log(username)
+    const sqlSearch = "SELECT * FROM itemstable WHERE username = ?";
+    const searchQuery = mysql.format(sqlSearch, [username]);
+
+    db.query(searchQuery, (error, result) => {
+        if (error) {
+            return console.log(error)
+        }
+        if (result) {
+            console.log(result);
+        } else {
+            console.log({message: 'couldnt find items'})
+        }
     });
 });
 
@@ -153,11 +170,11 @@ app.post('/add-item', (req, res) => {
 
     db.query(insertQuery, (error, result) => {
         if (error) {
-            return console.log(error)
-        };
+            return console.log(error);
+        }
 
-        res.send(result)
-    })
+        res.send(result);
+    });
 });
 
 app.listen(PORT, () => {
