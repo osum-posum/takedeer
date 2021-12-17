@@ -2,6 +2,7 @@ import '../css/App.css';
 import { useState, useEffect } from 'react';   
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import moment from 'moment';
 
 const User = () => {
 
@@ -9,7 +10,7 @@ const User = () => {
 
     const [name, setName] = useState('');
 
-    const [itemsList, setItemsList] = useState('');
+    const [itemsList, setItemsList] = useState([]);
 
     const [list, setList]= useState({
         item: '',
@@ -105,9 +106,20 @@ const User = () => {
                         </tr>
                     </thead>
                     <tbody className='tbody'>
-                        <tr>
-                            <th></th>
-                        </tr>
+
+                        {itemsList.map((val) => (
+                            <tr>
+                                <td>{val.item}</td>
+                                <td>{val.spent}</td>
+                                <td>{val.net}</td>
+                                <td>{moment(val.date).format('MMM DD, YYYY')}</td>
+                                <td>
+                                    <button></button>
+                                    <button></button>
+                                </td>
+                            </tr>
+                        ))}
+
                     </tbody>
                 </table>
             </div>
