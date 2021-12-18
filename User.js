@@ -1,16 +1,32 @@
+// TODO:  finish edit function ( grab id of row selected, pass id to edit function, 
+// grab values for row and set current values to default values for input )
+
 import '../css/App.css';
-import { useState, useEffect } from 'react';   
+import { useState, useEffect, useRef } from 'react';   
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import moment from 'moment';
+import { Icon } from '@iconify/react';
+
 
 const User = () => {
 
     axios.defaults.withCredentials = true;
 
-    const [name, setName] = useState('');
+    let hid = 'form--hidden'
 
+    const tableRowRef = useRef(null);
+    const tableRowInputsRef = useRef(null);
+
+    const [name, setName] = useState('');
     const [itemsList, setItemsList] = useState([]);
+
+    const [newList, setNewList] = useState({
+        item: '',
+        spent: 0,
+        net: 0,
+        date: new Date()
+    });
 
     const [list, setList]= useState({
         item: '',
@@ -18,8 +34,15 @@ const User = () => {
         net: 0,
         date: new Date()
     });
+
+    const handleChangeNewList = (e) => {
+        setNewList({
+            ...newList,
+            [e.target.name]: e.target.value
+        });
+    };
     
-    const handleChange = (e) => {
+    const handleChangeList = (e) => {
         setList({
             ...list,
             [e.target.name]: e.target.value
@@ -61,6 +84,37 @@ const User = () => {
         });
     };
 
+    function deleteItem(id) {
+        axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
+            setItemsList(itemsList.filter((val) => {
+                return val.id !== id;
+            }));
+        });
+    };
+
+    const swapToInputs = () => {
+        const tRow = tableRowRef.current;
+        const tRowIn = tableRowInputsRef.current;
+
+        tRow.classList.add(hid);
+        tRowIn.classList.remove(hid);
+    };
+
+    function editItem(e, id) {
+        const tRow = tableRowRef.current;
+        const tRowIn = tableRowInputsRef.current;
+
+        axios.put(`http://localhost:3001/edit/${id}`, {
+            ...newList,
+            [e.target.name]: e.target.value,
+            id: id
+       }).then((response) => {
+           tRow.classList.remove(hid);
+           tRowIn.classList.add(hid);
+           console.log(response);
+       });
+    };
+
     return (
         <div className='container'>
 
@@ -76,16 +130,16 @@ const User = () => {
                     <form onSubmit={handleSubmit} className='form-inline'>
                         <div className='form-group'>
                             <label>item</label>
-                            <input onChange={handleChange} name='item' type='name' className='input--css2'></input>
+                            <input onChange={handleChangeList} name='item' type='name' className='input--css2' />
 
                             <label >spent</label>
-                            <input onChange={handleChange} name='spent' type='number' step='any' className='input--css2'></input>
+                            <input onChange={handleChangeList} name='spent' type='number' step='any' className='input--css2' />
 
                             <label >net</label>
-                            <input onChange={handleChange} name='net' type='number' step='any' className='input--css2'></input>
+                            <input onChange={handleChangeList} name='net' type='number' step='any' className='input--css2' />
 
                             <label>date</label>
-                            <input onChange={handleChange} name='date' type='date' className='input--css2'></input>
+                            <input onChange={handleChangeList} name='date' type='date' className='input--css2' />
 
                             <button onClick={addItem} className='btn-sharp'>enter</button>
                             <button onClick={findItems} className='btn-sharp'>find</button>
@@ -97,6 +151,7 @@ const User = () => {
             <div className='row mt-4'>
                 <table>
                     <thead>
+                        
                         <tr className='table--style'>
                             <th className='table--bro' scope='col'>item</th>
                             <th className='table--bro' scope='col'>spent</th>
@@ -107,15 +162,27 @@ const User = () => {
                     </thead>
                     <tbody className='tbody'>
 
+                    <tr className='form--hidden' ref={tableRowInputsRef}>
+                            <th><input onChange={handleChangeNewList} name='item' type='name' className='input--css2'/></th>
+                            <th><input onChange={handleChangeNewList} name='spent' type='number' step='any' className='input--css2'/></th>
+                            <th><input onChange={handleChangeNewList} name='net' type='number'step='any' className='input--css2'/></th>
+                            <th><input onChange={handleChangeNewList} name='date' type='date' className='input--css2'/></th>
+                            <Icon icon="bi:check" onClick={editItem}/>
+                        </tr>
+
                         {itemsList.map((val) => (
-                            <tr>
+                            <tr key={val.id} ref={tableRowRef}>
                                 <td>{val.item}</td>
                                 <td>{val.spent}</td>
                                 <td>{val.net}</td>
                                 <td>{moment(val.date).format('MMM DD, YYYY')}</td>
                                 <td>
-                                    <button></button>
-                                    <button></button>
+                                    <center>
+                                    <Icon icon="ant-design:edit-filled" onClick={swapToInputs}/>
+                                    <Icon icon='ci:close-small' onClick={() => {
+                                        deleteItem(val.id)
+                                    }}/>
+                                    </center>
                                 </td>
                             </tr>
                         ))}

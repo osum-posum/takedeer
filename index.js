@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const corsOptions = {
     origin: ['http://localhost:3000'],
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'DELETE', 'PUT'],
     credentials: true,
 };
 app.use(cors(corsOptions));
@@ -49,7 +49,7 @@ app.post('/create', (req, res) => {
     const { username, password, confirmPassword } = req.body;
     const sqlSearch = "SELECT * FROM userstable WHERE username = ?";
     const sqlInsert = "INSERT INTO userstable (username, password) VALUES (?, ?)";
-    const searchQuery = mysql.format(sqlSearch, [username]);
+    const searchQuery = mysql.format(sqlSearch, username);
 
     db.query(searchQuery, async(error, result) => {
         if (error) {
@@ -114,7 +114,7 @@ app.get('/login', (req, res) => {
 app.post('/login:id', (req, res) => {
     const { username, password } = req.body;
     const sqlSearch = "SELECT * FROM userstable WHERE username = ?";
-    const searchQuery = mysql.format(sqlSearch, [username]);
+    const searchQuery = mysql.format(sqlSearch, username);
 
     db.query(searchQuery, (error, result) => {
         if (error) {
@@ -149,17 +149,46 @@ app.post('/find-items', (req, res) => {
     const username = req.body.username;
     console.log(username)
     const sqlSearch = "SELECT * FROM itemstable WHERE username = ?";
-    const searchQuery = mysql.format(sqlSearch, [username]);
+    const searchQuery = mysql.format(sqlSearch, username);
 
     db.query(searchQuery, (error, result) => {
         if (error) {
             return console.log(error)
         }
         if (result) {
-            console.log(result);
+            res.send(result);
         } else {
             console.log({message: 'couldnt find items'})
         }
+    });
+});
+
+app.delete('/delete/:id', (req, res) => {
+    const id = req.params.id;
+    console.log(req.params.id)
+    const sqlDelete = "DELETE FROM itemstable WHERE id = ?";
+    const deleteQuery = mysql.format(sqlDelete, id)
+
+    db.query(deleteQuery, (error, result) => {
+        if (error) {
+            return console.log(error)
+        }
+
+        res.send(result);
+    });
+});
+
+app.put('/edit/:id', (req, res) => {
+    const { item, spent, net, date, id } = req.body;
+    const sqlUpdate = "UPDATE itemstable SET item = ?, spent = ?, net = ?, date = ? WHERE id = ?";
+    const updateQuery = mysql.format(sqlUpdate, [item, spent, net, date, id]);
+
+    db.query(updateQuery, (error, result) => {
+        if (error) {
+            return console.log(error);
+        }
+
+        res.send(result);
     });
 });
 
