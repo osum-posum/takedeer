@@ -180,6 +180,7 @@ app.delete('/delete/:id', (req, res) => {
 
 app.put('/edit/:id', (req, res) => {
     const { item, spent, net, date, id } = req.body;
+    console.log(req.body);
     const sqlUpdate = "UPDATE itemstable SET item = ?, spent = ?, net = ?, date = ? WHERE id = ?";
     const updateQuery = mysql.format(sqlUpdate, [item, spent, net, date, id]);
 

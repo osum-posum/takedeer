@@ -1,5 +1,5 @@
-// TODO:  finish edit function ( grab id of row selected, pass id to edit function, 
-// grab values for row and set current values to default values for input )
+// TODO:  finish edit function ( update items list as soon as edit item 
+// research how to update item )
 
 import '../css/App.css';
 import { useState, useEffect, useRef } from 'react';   
@@ -8,17 +8,17 @@ import { useNavigate } from 'react-router';
 import moment from 'moment';
 import { Icon } from '@iconify/react';
 
-
 const User = () => {
 
     axios.defaults.withCredentials = true;
 
-    let hid = 'form--hidden'
+    let hid = 'form--hidden';
 
     const tableRowRef = useRef(null);
     const tableRowInputsRef = useRef(null);
 
     const [name, setName] = useState('');
+    const [idState, setIdState] = useState('');
     const [itemsList, setItemsList] = useState([]);
 
     const [newList, setNewList] = useState({
@@ -92,22 +92,24 @@ const User = () => {
         });
     };
 
-    const swapToInputs = () => {
+    const swapToInputs = (id) => {
         const tRow = tableRowRef.current;
         const tRowIn = tableRowInputsRef.current;
+
+        setIdState(id);
 
         tRow.classList.add(hid);
         tRowIn.classList.remove(hid);
     };
 
-    function editItem(e, id) {
+    function editItem(e) {
         const tRow = tableRowRef.current;
         const tRowIn = tableRowInputsRef.current;
 
-        axios.put(`http://localhost:3001/edit/${id}`, {
+        axios.put(`http://localhost:3001/edit/:${idState}`, {
             ...newList,
             [e.target.name]: e.target.value,
-            id: id
+            id: idState 
        }).then((response) => {
            tRow.classList.remove(hid);
            tRowIn.classList.add(hid);
@@ -149,7 +151,7 @@ const User = () => {
             </div>
 
             <div className='row mt-4'>
-                <table>
+                <table className=''>
                     <thead>
                         
                         <tr className='table--style'>
@@ -178,9 +180,11 @@ const User = () => {
                                 <td>{moment(val.date).format('MMM DD, YYYY')}</td>
                                 <td>
                                     <center>
-                                    <Icon icon="ant-design:edit-filled" onClick={swapToInputs}/>
+                                    <Icon icon="ant-design:edit-filled" onClick={() => {
+                                        swapToInputs(val.id);
+                                    }}/>
                                     <Icon icon='ci:close-small' onClick={() => {
-                                        deleteItem(val.id)
+                                        deleteItem(val.id);
                                     }}/>
                                     </center>
                                 </td>
