@@ -1,5 +1,12 @@
-// TODO:  finish edit function ( update items list as soon as edit item 
-// research how to update item )
+// TODO: 
+// - scrollbox for table
+// - log out, end session
+
+// itemsList.map is not a function error
+// TODO: set up .map for table rows so 
+// that the table row i chose to edit
+// hides itself and returns inputs in that row
+
 
 import '../css/App.css';
 import { useState, useEffect, useRef } from 'react';   
@@ -14,12 +21,72 @@ const User = () => {
 
     let hid = 'form--hidden';
 
-    const tableRowRef = useRef(null);
-    const tableRowInputsRef = useRef(null);
-
     const [name, setName] = useState('');
     const [idState, setIdState] = useState('');
     const [itemsList, setItemsList] = useState([]);
+
+    const tableRowRef = useRef(null);
+    const tableRowInputsRef = useRef(null);
+
+    const [hide, setHide] = useState(false);
+
+    const hider = (id) => {
+        const items = itemsList.map((item) => {
+            if (item.id !== id) {
+                return item;
+            }
+
+            return { ...item, isHidden: true };
+        });
+
+        setItemsList({ items });
+        // setHide((prev) => !prev);
+    };
+
+    const renderData = () => {
+        return itemsList.map((i, index) => {
+            const { id, item, spent, net, date, isHidden } = i
+
+            if (isHidden === true) {
+                return null;
+                
+                    // (<tr className='form--hidden' >
+                    //     <th><input onChange={handleChangeNewList} placeholder={values.item} name='item' type='name' className='input--css2'/></th>
+                    //     <th><input onChange={handleChangeNewList} placeholder={values.spent} name='spent' type='number' step='any' className='input--css2'/></th>
+                    //     <th><input onChange={handleChangeNewList} placeholder={values.net} name='net' type='number'step='any' className='input--css2'/></th>
+                    //     <th><input onChange={handleChangeNewList} placeholder={moment(values.date).format('MMM DD, YYYY')} name='date' type='date' className='input--css2'/></th>
+                    //     <Icon icon="bi:check" onClick={editItem}/>
+                    // </tr>);
+            }
+
+            return (
+                <tr key={id} >
+                    <td>{item}</td>
+                    <td>{spent}</td>
+                    <td>{net}</td>
+                    <td>{moment(date).format('MMM DD, YYYY')}</td>
+                    <td>
+                        <center>
+                            <Icon icon="ant-design:edit-filled" onClick={() => {
+                                hider(id);
+                            }}/>
+                            <Icon icon='ci:close-small' onClick={() => {
+                                deleteItem(id);
+                            }}/>
+                        </center>
+                    </td>
+                </tr>
+            )
+        })
+        
+    }
+
+    const [values, setValues] = useState({
+        item: '',
+        spent: 0,
+        net: 0,
+        date: new Date()
+    });
 
     const [newList, setNewList] = useState({
         item: '',
@@ -92,14 +159,22 @@ const User = () => {
         });
     };
 
-    const swapToInputs = (id) => {
+    const swapToInputs = (val) => {
         const tRow = tableRowRef.current;
         const tRowIn = tableRowInputsRef.current;
 
-        setIdState(id);
+        setIdState(val.id);
+        setValues({
+            item: val.item,
+            spent: val.spent,
+            net: val.net,
+            date: val.date
+        });
 
-        tRow.classList.add(hid);
-        tRowIn.classList.remove(hid);
+        hider(val.id)
+
+        //tRow.classList.add(hid);
+        // tRowIn.classList.remove(hid);
     };
 
     function editItem(e) {
@@ -109,10 +184,12 @@ const User = () => {
         axios.put(`http://localhost:3001/edit/:${idState}`, {
             ...newList,
             [e.target.name]: e.target.value,
-            id: idState 
+            id: idState,
+            username: name
        }).then((response) => {
            tRow.classList.remove(hid);
            tRowIn.classList.add(hid);
+           setItemsList(response.data);
            console.log(response);
        });
     };
@@ -163,34 +240,7 @@ const User = () => {
                         </tr>
                     </thead>
                     <tbody className='tbody'>
-
-                    <tr className='form--hidden' ref={tableRowInputsRef}>
-                            <th><input onChange={handleChangeNewList} name='item' type='name' className='input--css2'/></th>
-                            <th><input onChange={handleChangeNewList} name='spent' type='number' step='any' className='input--css2'/></th>
-                            <th><input onChange={handleChangeNewList} name='net' type='number'step='any' className='input--css2'/></th>
-                            <th><input onChange={handleChangeNewList} name='date' type='date' className='input--css2'/></th>
-                            <Icon icon="bi:check" onClick={editItem}/>
-                        </tr>
-
-                        {itemsList.map((val) => (
-                            <tr key={val.id} ref={tableRowRef}>
-                                <td>{val.item}</td>
-                                <td>{val.spent}</td>
-                                <td>{val.net}</td>
-                                <td>{moment(val.date).format('MMM DD, YYYY')}</td>
-                                <td>
-                                    <center>
-                                    <Icon icon="ant-design:edit-filled" onClick={() => {
-                                        swapToInputs(val.id);
-                                    }}/>
-                                    <Icon icon='ci:close-small' onClick={() => {
-                                        deleteItem(val.id);
-                                    }}/>
-                                    </center>
-                                </td>
-                            </tr>
-                        ))}
-
+                        {renderData()}
                     </tbody>
                 </table>
             </div>
