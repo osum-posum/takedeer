@@ -2,12 +2,6 @@
 // - scrollbox for table
 // - log out, end session
 
-// itemsList.map is not a function error
-// TODO: set up .map for table rows so 
-// that the table row i chose to edit
-// hides itself and returns inputs in that row
-
-
 import '../css/App.css';
 import { useState, useEffect, useRef } from 'react';   
 import axios from 'axios';
@@ -28,9 +22,20 @@ const User = () => {
     const tableRowRef = useRef(null);
     const tableRowInputsRef = useRef(null);
 
-    const [hide, setHide] = useState(false);
+    // const [hide, setHide] = useState(false);
 
-    const hider = (id) => {
+    const hider = ({ id, item, spent, net, date }) => {
+        // TODO: set different values for each input if multiple inputs are selected... 
+        // unless...... write if statement saying if i'm editing an input i cannot edit another
+        // setValues({
+        //     item: item,
+        //     spent: spent,
+        //     net: net,
+        //     date: date
+        // });
+
+        setIdState(id)
+
         const items = itemsList.map((item) => {
             if (item.id !== id) {
                 return item;
@@ -39,7 +44,7 @@ const User = () => {
             return { ...item, isHidden: true };
         });
 
-        setItemsList({ items });
+        setItemsList(items);
         // setHide((prev) => !prev);
     };
 
@@ -48,15 +53,17 @@ const User = () => {
             const { id, item, spent, net, date, isHidden } = i
 
             if (isHidden === true) {
-                return null;
-                
-                    // (<tr className='form--hidden' >
-                    //     <th><input onChange={handleChangeNewList} placeholder={values.item} name='item' type='name' className='input--css2'/></th>
-                    //     <th><input onChange={handleChangeNewList} placeholder={values.spent} name='spent' type='number' step='any' className='input--css2'/></th>
-                    //     <th><input onChange={handleChangeNewList} placeholder={values.net} name='net' type='number'step='any' className='input--css2'/></th>
-                    //     <th><input onChange={handleChangeNewList} placeholder={moment(values.date).format('MMM DD, YYYY')} name='date' type='date' className='input--css2'/></th>
-                    //     <Icon icon="bi:check" onClick={editItem}/>
-                    // </tr>);
+                // return null;
+                return (
+                <tr key={id}>
+                <th><input onChange={handleChangeNewList} placeholder={values.item} name='item' type='name' className='input--css2'/></th>
+                <th><input onChange={handleChangeNewList} placeholder={values.spent} name='spent' type='number' step='any' className='input--css2'/></th>
+                <th><input onChange={handleChangeNewList} placeholder={values.net} name='net' type='number'step='any' className='input--css2'/></th>
+                <th><input onChange={handleChangeNewList} placeholder={moment(values.date).format('MMM DD, YYYY')} name='date' type='date' className='input--css2'/></th>
+                <Icon icon="bi:check" onClick={editItem}/>
+            </tr>
+            )
+                    
             }
 
             return (
@@ -68,10 +75,10 @@ const User = () => {
                     <td>
                         <center>
                             <Icon icon="ant-design:edit-filled" onClick={() => {
-                                hider(id);
+                                hider( { id: id, item: item, spent: spent, net: net, date: date } );
                             }}/>
                             <Icon icon='ci:close-small' onClick={() => {
-                                deleteItem(id);
+                                deleteItem( id );
                             }}/>
                         </center>
                     </td>
@@ -159,24 +166,6 @@ const User = () => {
         });
     };
 
-    const swapToInputs = (val) => {
-        const tRow = tableRowRef.current;
-        const tRowIn = tableRowInputsRef.current;
-
-        setIdState(val.id);
-        setValues({
-            item: val.item,
-            spent: val.spent,
-            net: val.net,
-            date: val.date
-        });
-
-        hider(val.id)
-
-        //tRow.classList.add(hid);
-        // tRowIn.classList.remove(hid);
-    };
-
     function editItem(e) {
         const tRow = tableRowRef.current;
         const tRowIn = tableRowInputsRef.current;
@@ -187,8 +176,6 @@ const User = () => {
             id: idState,
             username: name
        }).then((response) => {
-           tRow.classList.remove(hid);
-           tRowIn.classList.add(hid);
            setItemsList(response.data);
            console.log(response);
        });
@@ -228,7 +215,7 @@ const User = () => {
             </div>
 
             <div className='row mt-4'>
-                <table className=''>
+                <table className='scrolldown'>
                     <thead>
                         
                         <tr className='table--style'>
